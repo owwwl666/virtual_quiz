@@ -2,6 +2,7 @@ import argparse
 import re
 
 import redis
+from settings_db import questions_redis
 
 
 def formats_answer(answer, formatted_answer):
@@ -29,8 +30,6 @@ def save_new_questions(quiz_information, question_answer):
 
 
 if __name__ == "__main__":
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True, db=0)
-
     parser = argparse.ArgumentParser(
         description="Добавляет новые вопросы и ответы на них для игры в викторину."
     )
@@ -45,6 +44,6 @@ if __name__ == "__main__":
         question_answer={}
     )
 
-    quiz = r.hgetall("quiz") | new_questions
+    quiz = questions_redis.hgetall("quiz") | new_questions
 
-    r.hset("quiz", mapping=quiz)
+    questions_redis.hset("quiz", mapping=quiz)
