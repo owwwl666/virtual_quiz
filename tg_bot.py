@@ -9,12 +9,20 @@ from settings_db import questions_redis, users_redis, points_redis
 NEW_QUESTION, ANSWER, REFUSAL = range(3)
 
 
-def start_callback(update, _):
+def start(update, _):
     """Кнопка /start."""
     points_redis.set(f'{update.message.chat.id}', '0')
     update.message.reply_text("Привет! Я бот для викторин! Для начала игры нажми кнопку «Новый вопрос»!",
                               reply_markup=reply_markup)
     return NEW_QUESTION
+
+
+def close(update, _):
+    number_points = points_redis.get(update.message.chat.id)
+    update.message.reply_text(
+        f"Спасибо, за участие в Викторине!\nВаше количество правильных ответов: <b>{number_points}</b>",
+        parse_mode='HTML')
+    return ConversationHandler.END
 
 
 def handle_new_question_request(update, _):
@@ -62,7 +70,7 @@ if __name__ == "__main__":
 
     conv_handler = ConversationHandler(
         entry_points=[
-            CommandHandler('start', start_callback),
+            CommandHandler('start', start),
             MessageHandler(Filters.text('Мой счет'), handle_number_points)
         ],
         states={
@@ -75,7 +83,7 @@ if __name__ == "__main__":
                 MessageHandler(Filters.text, handle_solution_attempt),
             ]
         },
-        fallbacks=[]
+        fallbacks=[CommandHandler('close', close)]
     )
 
     dispatcher = updater.dispatcher
