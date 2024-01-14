@@ -1,4 +1,3 @@
-import json
 import random
 
 import redis
@@ -14,10 +13,16 @@ def start_callback(update, _):
 
 
 def reply_message(update, _):
+    questions = r.hgetall("quiz")
     if update.message.text == 'Новый вопрос':
-        questions = list(r.hgetall("quiz").keys())
-        question = random.choice(questions)
-        update.message.reply_text(question, reply_markup=reply_markup, parse_mode='HTML')
+        question = random.choice(list(questions.keys()))
+        r.set(f'{update.message.chat.id}', f'{question}')
+        update.message.reply_text(f'{question}\n{questions[r.get(f"{update.message.chat.id}")]}',
+                                  reply_markup=reply_markup, parse_mode='HTML')
+    elif update.message.text == questions[r.get(f"{update.message.chat.id}")]:
+        update.message.reply_text("Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос».")
+    else:
+        update.message.reply_text("Неправильно… Попробуешь ещё раз?")
 
 
 if __name__ == "__main__":
