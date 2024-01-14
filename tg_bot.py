@@ -40,9 +40,8 @@ def handle_solution_attempt(update, _):
         points_redis.set(f'{update.message.chat.id}', f'{number_points}')
         update.message.reply_text("Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос».")
         return NEW_QUESTION
-    else:
-        update.message.reply_text("Неправильно… Попробуешь ещё раз?")
-        return ANSWER
+    update.message.reply_text("Неправильно… Попробуешь ещё раз?")
+    return ANSWER
 
 
 def handle_message_correct_answer(update, context):
