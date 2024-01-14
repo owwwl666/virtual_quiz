@@ -4,6 +4,18 @@ import re
 import redis
 
 
+def formats_answer(answer, formatted_answer):
+    """Форматирует ответ на вопрос:
+
+    удаляет пояснения,точки и запятые,перенос строк,
+    каждое слово приводит к нижнему регистру."""
+    answer = re.split(r'[.\n\s",;]', answer)
+    for string in answer:
+        if '[' not in string and '(' not in string and ')' not in string and ']' not in string:
+            formatted_answer.append(string.lower())
+    return ' '.join(filter(lambda string: string != '', formatted_answer)).strip()
+
+
 def save_new_questions(quiz_information, question_answer):
     """Сохраняет в словарь новые вопросы и ответы на них."""
     for index, text in enumerate(quiz_information):
@@ -12,8 +24,8 @@ def save_new_questions(quiz_information, question_answer):
         if check:
             question = re.sub(phrase, '', text).replace('\n', '')
             answer = re.sub('Ответ:', '', quiz_information[index + 1])
-            question_answer[question] = answer
-        return question_answer
+            question_answer[question] = formats_answer(answer, [])
+    return question_answer
 
 
 if __name__ == "__main__":
@@ -33,5 +45,6 @@ if __name__ == "__main__":
         question_answer={}
     )
 
-    quiz = r.hgetall("quiz")
-    r.hset("quiz", mapping=new_questions | quiz)
+    quiz = r.hgetall("quiz") | new_questions
+
+    r.hset("quiz", mapping=quiz)
