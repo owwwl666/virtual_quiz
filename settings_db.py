@@ -17,3 +17,10 @@ users_redis = redis.Redis(
     db=env.int('USERS_DB'),
     decode_responses=True
 )
+
+points_redis = redis.Redis(
+    host=env.str('HOST'),
+    port=env.int('PORT'),
+    db=env.int('POINTS_DB'),
+    decode_responses=True
+)
