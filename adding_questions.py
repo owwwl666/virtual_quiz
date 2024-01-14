@@ -1,7 +1,6 @@
 import argparse
 import re
 
-import redis
 from settings_db import questions_redis
 
 

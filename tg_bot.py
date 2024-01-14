@@ -1,11 +1,10 @@
 import random
 
-import redis
 from environs import Env
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from buttons import reply_markup
-from settings_db import questions_redis,users_redis
+from settings_db import questions_redis, users_redis
 
 NEW_QUESTION, ANSWER, REFUSAL = range(3)
 
