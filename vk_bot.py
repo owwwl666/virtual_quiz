@@ -17,11 +17,11 @@ def add_keyboard():
 
     keyboard = VkKeyboard()
 
-    keyboard.add_button('Новый вопрос')
-    keyboard.add_button('Сдаться')
+    keyboard.add_button("Новый вопрос")
+    keyboard.add_button("Сдаться")
 
     keyboard.add_line()
-    keyboard.add_button('Мой счёт')
+    keyboard.add_button("Мой счёт")
 
     return keyboard.get_keyboard()
 
@@ -30,24 +30,24 @@ def start(event):
     """Запускает новую викторину.
 
     Обнуляет количество правильных ответов."""
-    points_redis.set(f'{event.user_id}', '0')
+    points_redis.set(f"{event.user_id}", "0")
     vk_api.messages.send(
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=add_keyboard(),
-        message='Для начала игры нажми кнопку «Новый вопрос»!'
+        message="Для начала игры нажми кнопку «Новый вопрос»!",
     )
 
 
 def get_random_question(event, questions):
     """Возвращает рандомный вопрос и выдает его пользователю."""
     question = random.choice(list(questions.keys()))
-    users_redis.set(f'{event.user_id}', f'{question}')
+    users_redis.set(f"{event.user_id}", f"{question}")
     return vk_api.messages.send(
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=add_keyboard(),
-        message=f'{question}'
+        message=f"{question}",
     )
 
 
@@ -56,29 +56,29 @@ def check_correct_answer(event):
     correct_anwser = questions[users_redis.get(f"{event.user_id}")]
     if event.text == correct_anwser:
         number_points = int(points_redis.get(event.user_id)) + 1
-        points_redis.set(f'{event.user_id}', f'{number_points}')
+        points_redis.set(f"{event.user_id}", f"{number_points}")
         return vk_api.messages.send(
             user_id=event.user_id,
             random_id=get_random_id(),
             keyboard=add_keyboard(),
-            message="Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»."
+            message="Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос».",
         )
     return vk_api.messages.send(
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=add_keyboard(),
-        message="Неправильно… Попробуешь ещё раз?"
+        message="Неправильно… Попробуешь ещё раз?",
     )
 
 
 def report_correct_answer(event, vk_api, questions):
-    """Сообщает пользователю правильный ответ при нажатии на кнопку 'Сдаться'"""
+    """Сообщает пользователю правильный ответ при нажатии на кнопку 'Сдаться'."""
     correct_anwser = questions[users_redis.get(f"{event.user_id}")]
     return vk_api.messages.send(
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=add_keyboard(),
-        message=f'Правильный ответ: {correct_anwser}\nДля того, чтобы продолжить, нажмите «Новый вопрос».'
+        message=f"Правильный ответ: {correct_anwser}\nДля того, чтобы продолжить, нажмите «Новый вопрос».",
     )
 
 
@@ -89,7 +89,7 @@ def get_number_points(event):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=add_keyboard(),
-        message=f'Количество правильных ответов:\n{points}'
+        message=f"Количество правильных ответов:\n{points}",
     )
 
 
@@ -112,16 +112,16 @@ if __name__ == "__main__":
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             try:
-                if event.text == 'Начать':
+                if event.text == "Начать":
                     start(event)
 
-                elif event.text == 'Новый вопрос':
+                elif event.text == "Новый вопрос":
                     get_random_question(event, questions)
 
-                elif event.text == 'Сдаться':
+                elif event.text == "Сдаться":
                     report_correct_answer(event, vk_api, questions)
 
-                elif event.text == 'Мой счёт':
+                elif event.text == "Мой счёт":
                     get_number_points(event)
 
                 else:
