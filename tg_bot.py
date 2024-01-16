@@ -61,12 +61,11 @@ def handle_message_correct_answer(update, context):
     correct_anwser = questions[users_redis.get(f"{update.message.chat.id}")]
     context.bot.send_message(
         update.effective_chat.id,
-        f"<b>Правильный ответ:</b>\n{correct_anwser}",
+        f"<b>Правильный ответ:</b>\n{correct_anwser}\nДля того, чтобы продолжить, нажмите «Новый вопрос».",
         reply_markup=reply_markup,
         parse_mode="HTML",
     )
-    handle_new_question_request(update, context)
-    return Quiz.ANSWER
+    return Quiz.NEW_QUESTION
 
 
 def handle_number_points(update, context):
