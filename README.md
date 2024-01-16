@@ -61,3 +61,34 @@ python adding_questions.py $PATH
 
 [Архив](https://dvmn.org/media/modules_dist/quiz-questions.zip) с вопросами.
 
+
+## tg_bot.py
+
+Телеграм бот для игры в викторину. Для запуска бота необходимо выбрать из меню (или ввести вручную) команду `/start`. Для выхода из игры - команду `/cancel`.
+
+Запуск бота:
+
+```sh
+python tg_bot.py
+```
+
+## vk_bot.py
+
+ВК бот для игры в викторину. Для начала нововй игры введите команду `Начать`.
+
+Запуск бота:
+
+```sh
+python vk_bot.py
+```
+
+
+# Результаты
+
+Пример результата для Telegram:
+
+![image](https://github.com/owwwl666/virtual_quiz/assets/131767856/0be19f8f-14c4-4b74-9683-61942af671dd)
+
+Пример результата для Вконтакте:
+
+![image](https://github.com/owwwl666/virtual_quiz/assets/131767856/243883f2-f7fd-403e-82b5-a6c5439db731)
