@@ -2,9 +2,9 @@ import random
 from enum import Enum
 
 from environs import Env
+from telegram import ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
-from buttons import reply_markup
 from settings_db import questions_redis, users_redis, points_redis
 
 
@@ -71,6 +71,13 @@ def cancel(update, _):
 if __name__ == "__main__":
     env = Env()
     env.read_env()
+
+    reply_markup = ReplyKeyboardMarkup(
+        [
+            ['Новый вопрос', 'Сдаться'],
+            ['Мой счёт']
+        ]
+    )
 
     updater = Updater(env.str("TELEGRAM_BOT_TOKEN"))
 
