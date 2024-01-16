@@ -7,11 +7,11 @@ from settings_db import questions_redis
 def formats_answer(answer, formatted_answer):
     """Форматирует ответ на вопрос:
 
-    удаляет пояснения,точки и запятые,перенос строк,
-    каждое слово приводит к нижнему регистру."""
+    Удаляет пояснения,точки и запятые,перенос строк.
+    Каждое слово приводит к нижнему регистру."""
     answer = re.split(r'[.\n\s",;]', answer)
     for string in answer:
-        if '[' not in string and '(' not in string and ')' not in string and ']' not in string:
+        if not set(string).issubset({'[', ']', '(', ')'}):
             formatted_answer.append(string.lower())
     return ' '.join(filter(lambda string: string != '', formatted_answer)).strip()
 
