@@ -1,10 +1,13 @@
+import logging
 import random
 from enum import Enum
 
+import telegram
 from environs import Env
 from telegram import ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
+from logger_bot import TelegramLogsHandler
 from settings_db import questions_redis, users_redis, points_redis
 
 
@@ -68,9 +71,20 @@ def cancel(update, _):
     return ConversationHandler.END
 
 
+def handle_errors(update, context):
+    """Обработчик исключений."""
+    logger.error(Exception, exc_info=True)
+
+
 if __name__ == "__main__":
     env = Env()
     env.read_env()
+
+    logger = logging.getLogger("logger")
+    log_bot = telegram.Bot(token=env.str("LOGGER_BOT_TOKEN"))
+
+    logging.basicConfig(format="%(levelname)s::%(message)s", level=logging.ERROR)
+    logger.addHandler(TelegramLogsHandler(bot=log_bot, chat_id=env.str("CHAT_ID")))
 
     reply_markup = ReplyKeyboardMarkup(
         [
@@ -107,5 +121,6 @@ if __name__ == "__main__":
 
     dispatcher = updater.dispatcher
     dispatcher.add_handler(conv_handler)
+    dispatcher.add_error_handler(handle_errors)
 
     updater.start_polling()

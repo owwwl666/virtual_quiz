@@ -1,11 +1,14 @@
+import logging
 import random
 
+import telegram
 import vk_api as vk
 from environs import Env
 from vk_api.keyboard import VkKeyboard
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
+from logger_bot import TelegramLogsHandler
 from settings_db import questions_redis, users_redis, points_redis
 
 
@@ -94,6 +97,12 @@ if __name__ == "__main__":
     env = Env()
     env.read_env()
 
+    logger = logging.getLogger("logger")
+    log_bot = telegram.Bot(token=env.str("LOGGER_BOT_TOKEN"))
+
+    logging.basicConfig(format="%(levelname)s::%(message)s", level=logging.ERROR)
+    logger.addHandler(TelegramLogsHandler(bot=log_bot, chat_id=env.str("CHAT_ID")))
+
     vk_session = vk.VkApi(token=env.str("VK_BOT_TOKEN"))
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
@@ -102,17 +111,20 @@ if __name__ == "__main__":
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            if event.text == 'Начать':
-                start(event)
+            try:
+                if event.text == 'Начать':
+                    start(event)
 
-            elif event.text == 'Новый вопрос':
-                get_random_question(event, questions)
+                elif event.text == 'Новый вопрос':
+                    get_random_question(event, questions)
 
-            elif event.text == 'Сдаться':
-                report_correct_answer(event, vk_api, questions)
+                elif event.text == 'Сдаться':
+                    report_correct_answer(event, vk_api, questions)
 
-            elif event.text == 'Мой счёт':
-                get_number_points(event)
+                elif event.text == 'Мой счёт':
+                    get_number_points(event)
 
-            else:
-                check_correct_answer(event)
+                else:
+                    check_correct_answer(event)
+            except Exception as err:
+                logger.error(err, exc_info=True)
