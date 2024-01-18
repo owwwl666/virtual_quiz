@@ -1,6 +1,7 @@
 import logging
 import random
 
+import redis
 import telegram
 import vk_api as vk
 from environs import Env
@@ -9,12 +10,10 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
 from logger_bot import TelegramLogsHandler
-from settings_db import questions_redis, users_redis, points_redis
 
 
 def add_keyboard():
     """Добавляет кнопки боту."""
-
     keyboard = VkKeyboard()
 
     keyboard.add_button("Новый вопрос")
@@ -96,6 +95,30 @@ def get_number_points(event):
 if __name__ == "__main__":
     env = Env()
     env.read_env()
+
+    questions_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("QUESTIONS_DB", 0),
+        password=env.int("QUESTIONS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
+
+    users_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("USERS_DB", 1),
+        password=env.int("USERS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
+
+    points_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("POINTS_DB", 2),
+        password=env.int("POINTS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
 
     logger = logging.getLogger("logger")
     log_bot = telegram.Bot(token=env.str("LOGGER_BOT_TOKEN"))

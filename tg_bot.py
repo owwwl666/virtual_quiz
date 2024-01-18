@@ -2,6 +2,7 @@ import logging
 import random
 from enum import Enum
 
+import redis
 import telegram
 from environs import Env
 from telegram import ReplyKeyboardMarkup
@@ -14,7 +15,6 @@ from telegram.ext import (
 )
 
 from logger_bot import TelegramLogsHandler
-from settings_db import questions_redis, users_redis, points_redis
 
 
 class Quiz(Enum):
@@ -95,6 +95,30 @@ def handle_errors(update, context):
 if __name__ == "__main__":
     env = Env()
     env.read_env()
+
+    questions_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("QUESTIONS_DB", 0),
+        password=env.int("QUESTIONS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
+
+    users_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("USERS_DB", 1),
+        password=env.int("USERS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
+
+    points_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("POINTS_DB", 2),
+        password=env.int("POINTS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
 
     logger = logging.getLogger("logger")
     log_bot = telegram.Bot(token=env.str("LOGGER_BOT_TOKEN"))

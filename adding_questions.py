@@ -1,7 +1,8 @@
 import argparse
 import re
 
-from settings_db import questions_redis
+import redis
+from environs import Env
 
 
 def formats_answer(answer, formatted_answer):
@@ -29,6 +30,17 @@ def get_new_questions(quiz_information, question_answer):
 
 
 if __name__ == "__main__":
+    env = Env()
+    env.read_env()
+
+    questions_redis = redis.Redis(
+        host=env.str("HOST", "localhost"),
+        port=env.int("PORT", 6379),
+        db=env.int("QUESTIONS_DB", 0),
+        password=env.int("QUESTIONS_DB_PASSWORD", None),
+        decode_responses=True,
+    )
+
     parser = argparse.ArgumentParser(
         description="Добавляет новые вопросы и ответы на них для игры в викторину."
     )
