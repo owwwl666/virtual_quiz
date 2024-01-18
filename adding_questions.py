@@ -9,15 +9,15 @@ def formats_answer(answer, formatted_answer):
 
     Удаляет пояснения,точки и запятые,перенос строк.
     Каждое слово приводит к нижнему регистру."""
-    answer = re.split(r'[.\n\s",;]', answer)
+    answer = re.split(r'[.\n\s",;!?]', answer)
     for string in answer:
         if not set(string) & {"[", "]", "(", ")"}:
             formatted_answer.append(string.lower())
     return " ".join(filter(lambda string: string != "", formatted_answer)).strip()
 
 
-def save_new_questions(quiz_information, question_answer):
-    """Сохраняет в словарь новые вопросы и ответы на них."""
+def get_new_questions(quiz_information, question_answer):
+    """Возвращает словарь с новыми вопросами и ответами на них."""
     for index, text in enumerate(quiz_information):
         phrase = r"Вопрос (\d{0,5}):"
         check = re.match(phrase, text)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     with open(args.file_path, "r", encoding="KOI8-R") as file:
         quiz_information = file.read().split("\n\n")
 
-    new_questions = save_new_questions(
+    new_questions = get_new_questions(
         quiz_information=quiz_information, question_answer={}
     )
 
