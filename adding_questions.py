@@ -11,7 +11,7 @@ def formats_answer(answer, formatted_answer):
     Каждое слово приводит к нижнему регистру."""
     answer = re.split(r'[.\n\s",;]', answer)
     for string in answer:
-        if not set(string).issubset({"[", "]", "(", ")"}):
+        if not set(string) & {"[", "]", "(", ")"}:
             formatted_answer.append(string.lower())
     return " ".join(filter(lambda string: string != "", formatted_answer)).strip()
 
